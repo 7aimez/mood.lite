@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Mood Light</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f5f5f5;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.5s ease;
+            overflow: hidden;
+        }
+        .mood-light {
+            width: 60vw;
+            height: 60vw;
+            max-width: 600px;
+            max-height: 600px;
+            border-radius: 50%;
+            transition: all 0.5s ease;
+            box-shadow: 0 0 80px rgba(255, 255, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .mood-light::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            filter: blur(30px);
+            opacity: 0.6;
+        }
+        .settings-btn {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .settings-btn:hover {
+            transform: scale(1.1);
+        }
+        .settings-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: #333;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 12px;
+            padding: 32px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .modal-content h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .modal-content .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .modal-content label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+        .modal-content select, .modal-content input[type="color"] {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            font-size: 14px;
+            background: #fafafa;
+            width: 100%;
+            cursor: pointer;
+        }
+        .modal-content input[type="color"] {
+            height: 40px;
+            padding: 4px;
+        }
+        .modal-content .color-picker-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .modal-content .bg-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            flex-shrink: 0;
+        }
+        .modal-content .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        .modal-content button {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .modal-content .toggle-mode-btn {
+            background: #1a1a1a;
+            color: white;
+        }
+        .modal-content .toggle-mode-btn:hover {
+            background: #333;
+        }
+        .modal-content .close-btn {
+            background: #f5f5f5;
+            color: #1a1a1a;
+        }
+        .modal-content .close-btn:hover {
+            background: #e0e0e0;
+        }
+        .dark-mode {
+            background-color: #1a1a1a;
+        }
+        .dark-mode .modal-content {
+            background: #2a2a2a;
+        }
+        .dark-mode .modal-content h2 {
+            color: #fff;
+        }
+        .dark-mode .modal-content label {
+            color: #ddd;
+        }
+        .dark-mode .modal-content select,
+        .dark-mode .modal-content input {
+            background: #333;
+            border-color: #444;
+            color: #fff;
+        }
+        .dark-mode .modal-content .bg-preview {
+            border-color: #444;
+        }
+        .dark-mode .modal-content .toggle-mode-btn {
+            background: #fff;
+            color: #1a1a1a;
+        }
+        .dark-mode .modal-content .toggle-mode-btn:hover {
+            background: #e0e0e0;
+        }
+        .dark-mode .modal-content .close-btn {
+            background: #444;
+            color: #fff;
+        }
+        .dark-mode .modal-content .close-btn:hover {
+            background: #555;
+        }
+        .dark-mode .settings-btn {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        .dark-mode .settings-btn svg {
+            fill: #fff;
+        }
+        .texture-neon {
+            background: linear-gradient(45deg, rgba(255, 0, 255, 0.8), rgba(0, 255, 255, 0.8));
+            box-shadow: 0 0 100px rgba(255, 0, 255, 0.6), 0 0 120px rgba(0, 255, 255, 0.6);
+        }
+        .texture-wood {
+            background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') center/cover;
+            box-shadow: 0 0 80px rgba(139, 69, 19, 0.4);
+        }
+        .texture-bright {
+            background: white;
+            box-shadow: 0 0 120px rgba(255, 255, 255, 0.8);
+        }
+        .texture-natural {
+            background: linear-gradient(to bottom, #f5f5dc, #e6e6fa);
+            box-shadow: 0 0 80px rgba(245, 245, 220, 0.6);
+        }
+        .texture-forest {
+            background: url('https://images.unsplash.com/photo-1448375240586-882707db888b') center/cover;
+            box-shadow: 0 0 80px rgba(34, 139, 34, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="mood-light" id="moodLight"></div>
+    <button class="settings-btn" id="settingsBtn">
+        <svg viewBox="0 0 24 24">
+            <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-2-3.46a.5.5 0 0 0-.61-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.5.5 0 0 0-.49-.41h-4a.5.5 0 0 0-.49.41l-.36 2.54c-.59.24-1.12.56-1.62.94l-2.39-.96a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .12.61l2.03 1.58c-.04.3-.06.61-.06.94s.02.64.06.94l-2.03 1.58a.49.49 0 0 0-.12.61l2 3.46a.5.5 0 0 0 .61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54a.5.5 0 0 0 .49.41h4a.5.5 0 0 0 .49-.41l.36-2.54c.59-.24 1.12-.56 1.62-.94l2.39.96a.5.5 0 0 0 .61-.22l2-3.46a.5.5 0 0 0-.12-.61l-2.03-1.58zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+        </svg>
+    </button>
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <h2>Settings</h2>
+            <div class="control-group">
+                <label for="colorPicker">Light Color</label>
+                <div class="color-picker-group">
+                    <input type="color" id="colorPicker" value="#ffffff">
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="textureSelect">Light Texture</label>
+                <select id="textureSelect">
+                    <option value="neon">Neon</option>
+                    <option value="wood">Wood</option>
+                    <option value="bright">Bright</option>
+                    <option value="natural">Natural</option>
+                    <option value="forest">Forest</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="bgColorPicker">Background Color</label>
+                <div class="color-picker-group">
+                    <input type="color" id="bgColorPicker" value="#f5f5f5">
+                    <span class="bg-preview" id="bgPreview"></span>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="toggle-mode-btn" id="toggleMode">Toggle Dark Mode</button>
+                <button class="close-btn" id="closeModal">Close</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const moodLight = document.getElementById('moodLight');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const closeModal = document.getElementById('closeModal');
+        const colorPicker = document.getElementById('colorPicker');
+        const textureSelect = document.getElementById('textureSelect');
+        const bgColorPicker = document.getElementById('bgColorPicker');
+        const toggleModeButton = document.getElementById('toggleMode');
+        const bgPreview = document.getElementById('bgPreview');
+
+        // Open modal
+        settingsBtn.addEventListener('click', () => {
+            settingsModal.style.display = 'flex';
+        });
+
+        // Close modal
+        closeModal.addEventListener('click', () => {
+            settingsModal.style.display = 'none';
+        });
+
+        // Apply color to light
+        colorPicker.addEventListener('input', () => {
+            if (['neon', 'natural', 'bright'].includes(textureSelect.value)) {
+                moodLight.style.background = colorPicker.value;
+            }
+            moodLight.style.boxShadow = `0 0 80px ${colorPicker.value}`;
+        });
+
+        // Apply texture to light
+        textureSelect.addEventListener('change', () => {
+            moodLight.className = 'mood-light';
+            moodLight.classList.add(`texture-${textureSelect.value}`);
+            if (['neon', 'natural', 'bright'].includes(textureSelect.value)) {
+                moodLight.style.background = colorPicker.value;
+            }
+        });
+
+        // Apply background color
+        bgColorPicker.addEventListener('input', () => {
+            document.body.style.backgroundColor = bgColorPicker.value;
+            bgPreview.style.backgroundColor = bgColorPicker.value;
+        });
+
+        // Toggle dark/light mode
+        toggleModeButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            toggleModeButton.textContent = document.body.classList.contains('dark-mode')
+                ? 'Toggle Light Mode'
+                : 'Toggle Dark Mode';
+        });
+
+        // Initialize
+        moodLight.classList.add('texture-neon');
+        bgPreview.style.backgroundColor = bgColorPicker.value;
+    </script>
+</body>
+</html>
